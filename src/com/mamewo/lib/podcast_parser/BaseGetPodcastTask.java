@@ -114,7 +114,7 @@ public class BaseGetPodcastTask
 				continue;
 			}
 			URL url = pinfo.url_;
-			Log.d(TAG, "get URL: " + ": "+ pinfo.url_);
+			Log.d(TAG, "get URL: " + pinfo.url_);
 			InputStream is = null;
 			try {
 				is = getInputStreamFromURL(url, timeoutSec_);
