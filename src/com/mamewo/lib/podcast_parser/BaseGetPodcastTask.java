@@ -13,6 +13,8 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -31,7 +33,7 @@ public class BaseGetPodcastTask
 	EpisodeInfo[] DUMMY_ARRAY = new EpisodeInfo[0];
 	
 	final static
-	private String TAG = "PodParser";
+	private String TAG = "podparser";
 
 	private enum TagName {
 		TITLE, PUBDATE, LINK, NONE
@@ -46,6 +48,7 @@ public class BaseGetPodcastTask
 		buffer_ = new ArrayList<EpisodeInfo>();
 	}
 
+	//TODO: proxy setting?
 	static
 	protected InputStream getInputStreamFromURL(URL url, int timeout)
 		throws IOException
@@ -55,13 +58,25 @@ public class BaseGetPodcastTask
 		return conn.getInputStream();
 	}
 
-	public static BitmapDrawable downloadIcon(Context context, URL iconURL, int timeout) {
+	//called from check task in podplayer preference
+	static
+	public BitmapDrawable downloadIcon(Context context, URL iconURL, int timeout) {
 		//get data
 		InputStream is = null;
 		BitmapDrawable result = null;
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+		//avoid OutOfMemory
+		opt.inDither = false;
+		opt.inPurgeable = true;
+		opt.inInputShareable = true;
+		opt.inTempStorage = new byte[32*1024];
+		BitmapDrawable bitmap = null;
+		//TODO: use small size
 		try {
 			is = getInputStreamFromURL(iconURL, timeout);
-			result = new BitmapDrawable(context.getResources(), is);
+			//result = new BitmapDrawable(context_.getResources(), is);
+			Bitmap tmp = BitmapFactory.decodeStream(is, null, opt);
+			bitmap = new BitmapDrawable(context.getResources(), tmp);
 		}
 		catch(IOException e) {
 			Log.i(TAG, "cannot load icon", e);
@@ -76,7 +91,7 @@ public class BaseGetPodcastTask
 				}
 			}
 		}
-		return result;
+		return bitmap;
 	}
 
 	@Override
@@ -127,6 +142,7 @@ public class BaseGetPodcastTask
 							tagName = TagName.LINK;
 						}
 						else if("enclosure".equalsIgnoreCase(currentName)) {
+							//TODO: check type attribute
 							podcastURL = parser.getAttributeValue(null, "url");
 						}
 						else if("itunes:image".equalsIgnoreCase(currentName)) {
@@ -192,6 +208,7 @@ public class BaseGetPodcastTask
 				Log.i(TAG, "XmlPullParserException", e);
 			}
 			finally {
+				Log.i(TAG, "finished loading podcast");
 				if(null != is) {
 					try {
 						is.close();

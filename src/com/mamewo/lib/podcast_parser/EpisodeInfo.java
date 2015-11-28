@@ -7,11 +7,6 @@ import java.util.Date;
 import java.util.Locale;
 import android.util.Log;
 
-/**
- * @author Takashi Masuyama <mamewotoko@gmail.com>
- * http://www002.upp.so-net.ne.jp/mamewo/
- */
-
 public class EpisodeInfo
 	implements Serializable
 {
