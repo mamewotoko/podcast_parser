@@ -1,5 +1,4 @@
-podcast_parser: Android AsyncTask class to parse podcast file
-[![Build Status](https://travis-ci.org/mamewotoko/podcast_parser.svg)](https://travis-ci.org/mamewotoko/podcast_parser)
+podcast_parser: Android AsyncTask class to parse podcast file [![Build Status](https://travis-ci.org/mamewotoko/podcast_parser.svg)](https://travis-ci.org/mamewotoko/podcast_parser)
 =============================================================
 
 AsyncTask to fetch and parse podcast xml
