@@ -1,7 +1,8 @@
 podcast_parser: Android AsyncTask class to parse podcast file
 =============================================================
 
-To share code between podplayer and malarm....
+AsyncTask to fetch and parse podcast xml
+
 
 Related repositories
 --------------------
