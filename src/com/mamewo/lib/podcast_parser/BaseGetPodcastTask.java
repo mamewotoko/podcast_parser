@@ -7,6 +7,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.input.BOMInputStream;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -50,12 +52,17 @@ public class BaseGetPodcastTask
 
 	//TODO: proxy setting?
 	static
-	protected InputStream getInputStreamFromURL(URL url, int timeout)
+	protected InputStream getInputStreamFromURL(URL url, int timeout, boolean excludeBOM)
 		throws IOException
 	{
 		URLConnection conn = url.openConnection();
 		conn.setReadTimeout(timeout * 1000);
-		return conn.getInputStream();
+		//exclude UTF-8 bom
+		InputStream is = conn.getInputStream();
+		if(excludeBOM){
+			is = new BOMInputStream(is, false);
+		}
+		return is;
 	}
 
 	//called from check task in podplayer preference
@@ -73,7 +80,7 @@ public class BaseGetPodcastTask
 		BitmapDrawable bitmap = null;
 		//TODO: use small size
 		try {
-			is = getInputStreamFromURL(iconURL, timeout);
+			is = getInputStreamFromURL(iconURL, timeout, false);
 			//result = new BitmapDrawable(context_.getResources(), is);
 			Bitmap tmp = BitmapFactory.decodeStream(is, null, opt);
 			bitmap = new BitmapDrawable(context.getResources(), tmp);
@@ -117,7 +124,7 @@ public class BaseGetPodcastTask
 			Log.d(TAG, "get URL: " + pinfo.url_);
 			InputStream is = null;
 			try {
-				is = getInputStreamFromURL(url, timeoutSec_);
+				is = getInputStreamFromURL(url, timeoutSec_, true);
 				XmlPullParser parser = factory.newPullParser();
 				//TODO: use reader or give correct encoding
 				parser.setInput(is, "UTF-8");
