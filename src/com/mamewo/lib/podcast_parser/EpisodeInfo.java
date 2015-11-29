@@ -14,7 +14,7 @@ public class EpisodeInfo
 	static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN, Locale.US);
 
 	static final
-	String TAG = "PodParser";
+	String TAG = "podparser";
 	
 	private static final long serialVersionUID = 1L;
 	final public String url_;
