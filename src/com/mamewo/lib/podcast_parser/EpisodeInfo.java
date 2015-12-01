@@ -47,4 +47,8 @@ public class EpisodeInfo
 		}
 		return pubdate_;
 	}
+
+	public boolean equalEpisode(EpisodeInfo other){
+		return url_.equals(other.url_) && pubdate_.equals(other.pubdate_);
+	}
 }

@@ -52,7 +52,7 @@ public class BaseGetPodcastTask
 
 	//TODO: proxy setting?
 	static
-	protected InputStream getInputStreamFromURL(URL url, int timeout, boolean excludeBOM)
+	public InputStream getInputStreamFromURL(URL url, int timeout, boolean excludeBOM)
 		throws IOException
 	{
 		URLConnection conn = url.openConnection();
@@ -62,6 +62,7 @@ public class BaseGetPodcastTask
 		if(excludeBOM){
 			is = new BOMInputStream(is, false);
 		}
+		Log.d(TAG, "inputStream: class "+is.getClass());
 		return is;
 	}
 
@@ -81,7 +82,6 @@ public class BaseGetPodcastTask
 		//TODO: use small size
 		try {
 			is = getInputStreamFromURL(iconURL, timeout, false);
-			//result = new BitmapDrawable(context_.getResources(), is);
 			Bitmap tmp = BitmapFactory.decodeStream(is, null, opt);
 			bitmap = new BitmapDrawable(context.getResources(), tmp);
 		}
