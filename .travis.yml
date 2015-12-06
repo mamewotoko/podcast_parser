@@ -5,5 +5,5 @@ android:
         - android-10
     licences:
         - '.+'
-    script:
-        - ./gradlew build
+script:
+    - ./gradlew build
