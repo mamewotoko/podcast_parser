@@ -33,6 +33,7 @@ public class BaseGetPodcastTask
 	private int BUFFER_SIZE = 10;
 	final static
 	EpisodeInfo[] DUMMY_ARRAY = new EpisodeInfo[0];
+	private int scaledIconSize_;
 	
 	final static
 	private String TAG = "podparser";
@@ -42,12 +43,17 @@ public class BaseGetPodcastTask
 	};
 
 	//TODO refactor to cache icon
-	public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon) {
+	public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon, int scaledIconSize) {
 		context_ = context;
 		limit_ = limit;
 		timeoutSec_ = timeoutSec;
 		getIcon_ = getIcon;
 		buffer_ = new ArrayList<EpisodeInfo>();
+		scaledIconSize_ = scaledIconSize;
+	}
+
+	public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon) {
+		this(context, limit, timeoutSec, getIcon, -1);
 	}
 
 	//TODO: proxy setting?
@@ -68,7 +74,7 @@ public class BaseGetPodcastTask
 
 	//called from check task in podplayer preference
 	static
-	public BitmapDrawable downloadIcon(Context context, URL iconURL, int timeout) {
+	public BitmapDrawable downloadIcon(Context context, URL iconURL, int timeout, int scaledIconSize) {
 		//get data
 		InputStream is = null;
 		BitmapDrawable result = null;
@@ -83,7 +89,16 @@ public class BaseGetPodcastTask
 		try {
 			is = getInputStreamFromURL(iconURL, timeout, false);
 			Bitmap tmp = BitmapFactory.decodeStream(is, null, opt);
-			bitmap = new BitmapDrawable(context.getResources(), tmp);
+			//Log.d(TAG, "get bitmap size:" + tmp.getWidth() + ", " + tmp.getHeight());
+			Bitmap scaled;
+			if(scaledIconSize < 0){
+				scaled = tmp;
+			}
+			else {
+				scaled = Bitmap.createScaledBitmap(tmp, scaledIconSize, scaledIconSize, false);
+				tmp.recycle();
+			}
+			bitmap = new BitmapDrawable(context.getResources(), scaled);
 		}
 		catch(IOException e) {
 			Log.i(TAG, "cannot load icon", e);
@@ -157,7 +172,7 @@ public class BaseGetPodcastTask
 								URL iconURL = new URL(parser.getAttributeValue(null, "href"));
 								iconURL_[i] = iconURL;
 								if(getIcon_ && null == pinfo.icon_) {
-									pinfo.icon_ = downloadIcon(context_, iconURL, timeoutSec_);
+									pinfo.icon_ = downloadIcon(context_, iconURL, timeoutSec_, scaledIconSize_);
 								}
 							}
 						}

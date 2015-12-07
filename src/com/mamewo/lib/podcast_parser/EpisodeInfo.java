@@ -35,7 +35,7 @@ public class EpisodeInfo
 		}
 		catch (ParseException e) {
 			pubdateobj_ = null;
-			Log.d(TAG, "parse error: " + pubdate, e);
+			Log.d(TAG, "parse error: " + pubdate);
 		}
 		link_ = link;
 		index_ = index;
