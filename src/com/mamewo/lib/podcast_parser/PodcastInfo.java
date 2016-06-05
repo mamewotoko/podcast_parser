@@ -3,8 +3,6 @@ package com.mamewo.lib.podcast_parser;
 import java.io.Serializable;
 import java.net.URL;
 
-//import android.graphics.drawable.BitmapDrawable;
-
 public class PodcastInfo 
 	implements Serializable
 {
@@ -15,17 +13,9 @@ public class PodcastInfo
 	public String title_;
 	public URL url_;
 	public boolean enabled_;
-	//transient public BitmapDrawable icon_;
-    public URL iconURL_;
+    public String iconURL_;
 
-	// public PodcastInfo(String title, URL url, BitmapDrawable icon, boolean enabled) {
-	// 	title_ = title;
-	// 	url_ = url;
-	// 	icon_ = icon;
-	// 	enabled_ = enabled;
-	// }
-
-    public PodcastInfo(String title, URL url, URL iconURL, boolean enabled) {
+    public PodcastInfo(String title, URL url, String iconURL, boolean enabled) {
 		title_ = title;
 		url_ = url;
 		iconURL_ = iconURL;
@@ -44,23 +34,11 @@ public class PodcastInfo
         return enabled_;
     }
 
-    //null
-    // public BitmapDrawable getIcon(){
-    //     return icon_;
-    // }
-
-    public URL getIconURL(){
+    public String getIconURL(){
         return iconURL_;
     }
 
-    public void setIconURL(URL url){
+    public void setIconURL(String url){
         iconURL_ = url;
-    }
-
-    public String getIconURLString(){
-        if(null == iconURL_){
-            return null;
-        }
-        return iconURL_.toString();
     }
 }

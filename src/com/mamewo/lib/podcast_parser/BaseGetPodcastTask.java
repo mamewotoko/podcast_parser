@@ -14,9 +14,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.content.Context;
-// import android.graphics.drawable.BitmapDrawable;
-// import android.graphics.BitmapFactory;
-// import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -72,50 +69,9 @@ public class BaseGetPodcastTask
 		return is;
 	}
 
-	//called from check task in podplayer preference
-	// static
-	// public BitmapDrawable downloadIcon(Context context, URL iconURL, int timeout, int scaledIconSize) {
-	// 	//get data
-	// 	InputStream is = null;
-	// 	BitmapDrawable result = null;
-	// 	BitmapFactory.Options opt = new BitmapFactory.Options();
-	// 	//avoid OutOfMemory
-	// 	opt.inDither = false;
-	// 	opt.inPurgeable = true;
-	// 	opt.inInputShareable = true;
-	// 	opt.inTempStorage = new byte[32*1024];
-	// 	BitmapDrawable bitmap = null;
-	// 	//TODO: use small size
-	// 	try {
-	// 		is = getInputStreamFromURL(iconURL, timeout, false);
-	// 		Bitmap tmp = BitmapFactory.decodeStream(is, null, opt);
-	// 		//Log.d(TAG, "get bitmap size:" + tmp.getWidth() + ", " + tmp.getHeight());
-	// 		Bitmap scaled;
-	// 		if(scaledIconSize < 0){
-	// 			scaled = tmp;
-	// 		}
-	// 		else {
-	// 			scaled = Bitmap.createScaledBitmap(tmp, scaledIconSize, scaledIconSize, false);
-	// 			tmp.recycle();
-	// 		}
-	// 		bitmap = new BitmapDrawable(context.getResources(), scaled);
-	// 	}
-	// 	catch(IOException e) {
-	// 		Log.i(TAG, "cannot load icon", e);
-	// 	}
-	// 	finally {
-	// 		if(null != is) {
-	// 			try{
-	// 				is.close();
-	// 			}
-	// 			catch(IOException e) {
-	// 				//nop..
-	// 			}
-	// 		}
-	// 	}
-	// 	return bitmap;
-	// }
-
+    /**
+     * @param podcastInfo podcast to load. podcastInfo.iconURL_ will be updated in this function
+     */
 	@Override
 	protected Void doInBackground(PodcastInfo... podcastInfo) {
 		XmlPullParserFactory factory;
@@ -126,7 +82,6 @@ public class BaseGetPodcastTask
 			Log.i(TAG, "cannot get xml parser", e1);
 			return null;
 		}
-		//iconURL_ = new URL[podcastInfo.length];
 		for(int i = 0; i < podcastInfo.length; i++) {
 			PodcastInfo pinfo = podcastInfo[i];
 			if(isCancelled()){
@@ -145,7 +100,7 @@ public class BaseGetPodcastTask
 				parser.setInput(is, "UTF-8");
 				String title = null;
 				String podcastURL = null;
-                URL iconURL = null;
+                String iconURL = null;
 				String pubdate = "";
 				TagName tagName = TagName.NONE;
 				int eventType;
@@ -170,9 +125,7 @@ public class BaseGetPodcastTask
 						}
 						else if("itunes:image".equalsIgnoreCase(currentName)) {
 							if(null == iconURL) {
-                                //
-								iconURL = new URL(parser.getAttributeValue(null, "href"));
-                                ///XXXX
+								iconURL = parser.getAttributeValue(null, "href");
                                 pinfo.setIconURL(iconURL);
 							}
 						}
