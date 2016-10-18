@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.net.PasswordAuthentication;
+import java.net.Authenticator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URL;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,31 +23,50 @@ import org.json.JSONTokener;
 import android.content.Context;
 import android.util.Log;
 
-public class SimpleAuthenticator {
+//Basic auth only?
+public class SimpleAuthenticator
+    extends Authenticator
+{
     static
     private Map<String, AuthInfo> authCache_ = null;
 
-	final static
-	private String TAG = "podparser";
+    final static
+    private String TAG = "podparser";
     
     final static
     private String AUTH_FILENAME = "auth.json";
 
+    final static
+    public int NONE = 0;
+    final static
+    public int SUCCESS = 1;
+    final static
+    public int TRYING = 2;
+
+    private PasswordPromptFuture listener_;
+
+    static
+    public interface PasswordPromptFuture {
+        public void startPasswordPrompt(URL url, String prompt);
+    }
+    
     static
     public class AuthInfo
     {
         public String user_;
         public String password_;
+        public int status_;
         
-        public AuthInfo(String user, String password){
+        public AuthInfo(String user, String password, int status){
             user_ = user;
             password_ = password;
+            status_ = status;
         }
     }
     
-    // root_url,user,password,realm
+    // root_url,user,password,(realm)
     static
-	public void initAuthCache(Context context) {
+    public void initAuthCache(Context context) {
         authCache_ = new HashMap<String, AuthInfo>();
         File configFile = context.getFileStreamPath(AUTH_FILENAME);
         if(configFile.exists()){
@@ -73,14 +94,14 @@ public class SimpleAuthenticator {
                     String password = value.getString("password");
 
                     long lastPassedTime = 0;
-                    authCache_.put(rootURL, new AuthInfo(user, password));
+                    authCache_.put(rootURL, new AuthInfo(user, password, NONE));
                 }
-			}
-			catch (IOException e) {
-				Log.d(TAG, "IOException", e);
-			}
+            }
+            catch (IOException e) {
+                Log.d(TAG, "IOException", e);
+            }
             catch (JSONException e3) {
-				Log.d(TAG, "JSONException", e3);
+                Log.d(TAG, "JSONException", e3);
             }
             finally {
                 try{
@@ -99,7 +120,7 @@ public class SimpleAuthenticator {
     }
 
     static
-	public void writeAuthCache(Context context) {
+    public void writeAuthCache(Context context) {
         JSONArray array = new JSONArray();
 
         try{
@@ -118,17 +139,17 @@ public class SimpleAuthenticator {
         catch(JSONException e){
             array = new JSONArray();
         }
-		String json = array.toString();
-		//Log.d(TAG, "JSON: " + json);
-		FileOutputStream fos = null;
-		try{
+        String json = array.toString();
+        //Log.d(TAG, "JSON: " + json);
+        FileOutputStream fos = null;
+        try{
             fos = context.openFileOutput(AUTH_FILENAME, Context.MODE_PRIVATE);
-			fos.write(json.getBytes());
-		}
+            fos.write(json.getBytes());
+        }
         catch(IOException e){
             Log.d(TAG, "IOException", e);
         }
-		finally {
+        finally {
             try{
                 if(null != fos){
                     fos.close();
@@ -136,7 +157,46 @@ public class SimpleAuthenticator {
             }
             catch(IOException e2){
             }
-		}
+        }
     }
-   
+
+    static
+    public String effectiveURL(URL url){
+        return url.getProtocol()+"://"+url.getAuthority();
+    }
+
+    static
+    public void markSuccess(URL url){
+        String effectiveURL = effectiveURL(url);
+        AuthInfo cache = authCache_.get(effectiveURL);
+        if(null != cache){
+            cache.status_ = SUCCESS;
+        }
+    }
+    
+    @Override
+    protected PasswordAuthentication getPasswordAuthentication(){
+        //always ask password
+        String prompt = getRequestingPrompt();
+
+        URL requestURL = getRequestingURL();
+        String requestEffectiveURL = effectiveURL(requestURL);
+        AuthInfo cache = authCache_.get(requestEffectiveURL);
+
+        if(null != cache){
+            if(cache.status_ == NONE || cache.status_ == SUCCESS){
+                //concurrent request...?
+                cache.status_ = TRYING;
+                //return new PasswordAuthentication(cache.user_, cache.password_.toByteArray());
+                return null;
+            }
+        }
+        //TODO: detect user and/or password is wrong
+        // i.e. compare cache with requested password
+        listener_.startPasswordPrompt(requestURL, prompt);
+        
+        //TODO: display password dialog then retry, fail now
+        return null;
+    }
+
 }
