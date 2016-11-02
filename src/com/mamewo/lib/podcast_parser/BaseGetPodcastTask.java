@@ -27,10 +27,11 @@ public class BaseGetPodcastTask
     private List<EpisodeInfo> buffer_;
     int timeoutSec_;
     final static
-    private int BUFFER_SIZE = 10;
+    private int DEFAULT_BUFFER_SIZE = 10;
     final static
     EpisodeInfo[] DUMMY_ARRAY = new EpisodeInfo[0];
     private int scaledIconSize_;
+    private int publishBufferSize_;
 
     final static
     private String TAG = "podparser";
@@ -40,13 +41,19 @@ public class BaseGetPodcastTask
     };
 
     //TODO refactor to cache icon
-    public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon, int scaledIconSize) {
+    public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon, int scaledIconSize, int publishBufferSize) {
         context_ = context;
         limit_ = limit;
         timeoutSec_ = timeoutSec;
         getIcon_ = getIcon;
         buffer_ = new ArrayList<EpisodeInfo>();
         scaledIconSize_ = scaledIconSize;
+        publishBufferSize = publishBufferSize_;
+    }
+
+    //TODO refactor to cache icon
+    public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon, int scaledIconSize) {
+        this(context, limit, timeoutSec, getIcon, scaledIconSize, DEFAULT_BUFFER_SIZE);
     }
 
     public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon) {
@@ -155,7 +162,8 @@ public class BaseGetPodcastTask
                                 }
                                 EpisodeInfo info = new EpisodeInfo(podcastURL, title, pubdate, link, i);
                                 buffer_.add(info);
-                                if (buffer_.size() >= BUFFER_SIZE) {
+                                if (buffer_.size() >= publishBufferSize_) {
+                                    Log.d(TAG, "publish: "+podcastURL+" "+title);
                                     publish();
                                 }
                             }
