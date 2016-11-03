@@ -6,4 +6,4 @@ android:
     licences:
         - '.+'
 script:
-    - ./gradlew build
+    - ./gradlew assembleDebug
