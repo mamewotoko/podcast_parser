@@ -43,6 +43,7 @@ android {
 
 dependencies {
   compile files('libs/commons-io-2.4.jar')
+  compile 'com.squareup.okhttp3:okhttp:3.4.1'
 }
 
 task wrapper(type: Wrapper) {

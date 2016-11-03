@@ -13,6 +13,10 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import okhttp3.Response;
+import okhttp3.Request;
+import okhttp3.OkHttpClient;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -21,11 +25,10 @@ public class BaseGetPodcastTask
     extends AsyncTask<PodcastInfo, EpisodeInfo, Void>
 {
     private Context context_;
+    private OkHttpClient client_;
     private int limit_;
-    //private URL[] iconURL_;
     private boolean getIcon_;
     private List<EpisodeInfo> buffer_;
-    int timeoutSec_;
     final static
     private int DEFAULT_BUFFER_SIZE = 10;
     final static
@@ -40,11 +43,19 @@ public class BaseGetPodcastTask
         TITLE, PUBDATE, LINK, NONE
     };
 
-    //TODO refactor to cache icon
-    public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon, int scaledIconSize, int publishBufferSize) {
+    /**
+     * @param client OkHttpClient cache and timeout is configured
+     */
+    public BaseGetPodcastTask(Context context,
+                              OkHttpClient client,
+                              int limit,
+                              boolean getIcon,
+                              int scaledIconSize,
+                              int publishBufferSize)
+    {
         context_ = context;
         limit_ = limit;
-        timeoutSec_ = timeoutSec;
+        client_ = client;
         getIcon_ = getIcon;
         buffer_ = new ArrayList<EpisodeInfo>();
         scaledIconSize_ = scaledIconSize;
@@ -52,28 +63,12 @@ public class BaseGetPodcastTask
     }
 
     //TODO refactor to cache icon
-    public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon, int scaledIconSize) {
-        this(context, limit, timeoutSec, getIcon, scaledIconSize, DEFAULT_BUFFER_SIZE);
+    public BaseGetPodcastTask(Context context, OkHttpClient client, int limit, boolean getIcon, int scaledIconSize) {
+        this(context, client, limit, getIcon, scaledIconSize, DEFAULT_BUFFER_SIZE);
     }
 
-    public BaseGetPodcastTask(Context context, int limit, int timeoutSec, boolean getIcon) {
-        this(context, limit, timeoutSec, getIcon, -1);
-    }
-
-    //TODO: proxy setting?
-    static
-    public InputStream getInputStreamFromURL(URL url, int timeout, boolean excludeBOM)
-        throws IOException
-    {
-        URLConnection conn = url.openConnection();
-        conn.setReadTimeout(timeout * 1000);
-        //exclude UTF-8 bom
-        InputStream is = conn.getInputStream();
-        if(excludeBOM){
-            is = new BOMInputStream(is, false);
-        }
-        Log.d(TAG, "inputStream: class "+is.getClass());
-        return is;
+    public BaseGetPodcastTask(Context context, OkHttpClient client, int limit, boolean getIcon) {
+        this(context, client, limit, getIcon, -1);
     }
 
     /**
@@ -101,7 +96,25 @@ public class BaseGetPodcastTask
             Log.d(TAG, "get URL: " + pinfo.url_);
             InputStream is = null;
             try {
-                is = getInputStreamFromURL(url, timeoutSec_, true);
+                Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+                Response response = client_.newCall(request).execute();
+                if(response.code() == 401){
+                    //TODO: queue auth request and retry
+                    Log.i(TAG, "auth required: "+url);
+                    continue;
+                }
+                if(!response.isSuccessful()){
+                    Log.i(TAG, "http error: "+response.message()+", "+url.toString());
+                    continue;
+                }
+                is = response.body().byteStream();
+                //exclude UTF-8 bom
+                is = new BOMInputStream(is, false);
+                Log.d(TAG, "inputStream: class "+is.getClass());
+
+                //is = getInputStreamFromURL(url, timeoutSec_, true);
                 XmlPullParser parser = factory.newPullParser();
                 //TODO: use reader or give correct encoding
                 parser.setInput(is, "UTF-8");
@@ -160,7 +173,7 @@ public class BaseGetPodcastTask
                                 if(title == null) {
                                     title = podcastURL;
                                 }
-                                EpisodeInfo info = new EpisodeInfo(podcastURL, title, pubdate, link, i);
+                                EpisodeInfo info = new EpisodeInfo(pinfo, podcastURL, title, pubdate, link, i);
                                 buffer_.add(info);
                                 if (buffer_.size() >= publishBufferSize_) {
                                     Log.d(TAG, "publish: "+podcastURL+" "+title);
@@ -183,6 +196,7 @@ public class BaseGetPodcastTask
                     eventType = parser.next();
                 }
                 publish();
+                response.close();
             }
             catch (IOException e) {
                 Log.i(TAG, "IOException", e);

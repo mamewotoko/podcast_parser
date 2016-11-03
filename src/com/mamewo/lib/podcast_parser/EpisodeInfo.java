@@ -1,11 +1,14 @@
 package com.mamewo.lib.podcast_parser;
 
 import java.io.Serializable;
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Comparator;
+
 import android.util.Log;
 
 public class EpisodeInfo
@@ -19,6 +22,7 @@ public class EpisodeInfo
     String TAG = "podparser";
     
     private static final long serialVersionUID = 1L;
+    public PodcastInfo podcast_;
     final public String url_;
     final public String title_;
     final public String pubdate_;
@@ -26,7 +30,9 @@ public class EpisodeInfo
     final public String link_;
     final public int index_;
 
-    public EpisodeInfo(String url, String title, String pubdate, String link, int index) {
+    //url: without auth info
+    public EpisodeInfo(PodcastInfo podcast, String url, String title, String pubdate, String link, int index) {
+        podcast_ = podcast;
         url_ = url;
         title_ = title;
         pubdate_ = pubdate;
@@ -42,7 +48,7 @@ public class EpisodeInfo
         link_ = link;
         index_ = index;
     }
-        
+
     public String getPubdateString(){
         if(null != pubdateobj_) {
             //return pubdateobj_.toLocaleString();
@@ -54,9 +60,14 @@ public class EpisodeInfo
     }
 
     public boolean equalEpisode(EpisodeInfo other){
+        //TODO: remove user info from url
         return url_.equals(other.url_) && pubdate_.equals(other.pubdate_);
     }
 
+    public String getURL(){
+        return podcast_.addUserInfo(url_);
+    }
+    
     // static
     // public class PubdateComparator
     //     implements Serializable,

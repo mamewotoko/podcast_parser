@@ -2,6 +2,7 @@ package com.mamewo.lib.podcast_parser;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.net.MalformedURLException;
 
 public class PodcastInfo 
     implements Serializable
@@ -15,18 +16,38 @@ public class PodcastInfo
     public boolean enabled_;
     public String iconURL_;
 
-    public PodcastInfo(String title, URL url, String iconURL, boolean enabled) {
+    //TODO: hold in secure area?
+    public String username_;
+    public String password_;
+    
+    public PodcastInfo(String title, URL url, String iconURL, boolean enabled, String username, String password) {
         title_ = title;
         url_ = url;
         iconURL_ = iconURL;
         enabled_ = enabled;
+
+        username_ = username;
+        password_ = password;
     }
 
+    public PodcastInfo(String title, URL url, String iconURL, boolean enabled) {
+        this(title, url, iconURL, enabled, null, null);
+    }
+    
     public String getTitle(){
         return title_;
     }
 
     public URL getURL(){
+        if(null != username_ && null != password_){
+            //url_.setUserInfo(username_+":"+password_);
+            try{
+                return new URL(addUserInfo(url_.toString()));
+            }
+            catch (MalformedURLException e){
+                return null;
+            }
+        }
         return url_;
     }
 
@@ -35,10 +56,35 @@ public class PodcastInfo
     }
 
     public String getIconURL(){
-        return iconURL_;
+        return addUserInfo(iconURL_);
     }
 
     public void setIconURL(String url){
         iconURL_ = url;
+    }
+
+    public String getUsername(){
+        return username_;
+    }
+
+    public void setUsername(String username){
+        username_ = username;
+    }
+
+    public String getPassword(){
+        return password_;
+    }
+
+    public void setPassword(String password){
+        password_ = password;
+    }
+
+    public String addUserInfo(String url){
+        if(null == username_ || null == password_){
+            return url;
+        }
+        int pos = url.indexOf("://");
+        int len = url.length();
+        return url.substring(0, pos) + "://" + username_ +":"+password_+"@"+url.substring(pos+3);
     }
 }
