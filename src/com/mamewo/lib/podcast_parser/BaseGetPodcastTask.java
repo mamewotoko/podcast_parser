@@ -100,7 +100,6 @@ public class BaseGetPodcastTask
                 is = response.body().byteStream();
                 //exclude UTF-8 bom
                 is = new BOMInputStream(is, false);
-                Log.d(TAG, "inputStream: class "+is.getClass());
 
                 XmlPullParser parser = factory.newPullParser();
                 //TODO: use reader or give correct encoding
