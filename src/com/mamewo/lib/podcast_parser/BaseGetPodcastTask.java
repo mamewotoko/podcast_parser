@@ -3,7 +3,6 @@ package com.mamewo.lib.podcast_parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,13 +26,11 @@ public class BaseGetPodcastTask
     private Context context_;
     private OkHttpClient client_;
     private int limit_;
-    private boolean getIcon_;
     private List<EpisodeInfo> buffer_;
     final static
     private int DEFAULT_BUFFER_SIZE = 10;
     final static
-    EpisodeInfo[] DUMMY_ARRAY = new EpisodeInfo[0];
-    private int scaledIconSize_;
+    private EpisodeInfo[] DUMMY_ARRAY = new EpisodeInfo[0];
     private int publishBufferSize_;
 
     final static
@@ -41,7 +38,7 @@ public class BaseGetPodcastTask
 
     private enum TagName {
         TITLE, PUBDATE, LINK, NONE
-    };
+    }
 
     /**
      * @param client OkHttpClient cache and timeout is configured
@@ -49,26 +46,17 @@ public class BaseGetPodcastTask
     public BaseGetPodcastTask(Context context,
                               OkHttpClient client,
                               int limit,
-                              boolean getIcon,
-                              int scaledIconSize,
                               int publishBufferSize)
     {
         context_ = context;
         limit_ = limit;
         client_ = client;
-        getIcon_ = getIcon;
         buffer_ = new ArrayList<EpisodeInfo>();
-        scaledIconSize_ = scaledIconSize;
-        publishBufferSize = publishBufferSize_;
+        publishBufferSize_ = publishBufferSize;
     }
 
-    //TODO refactor to cache icon
-    public BaseGetPodcastTask(Context context, OkHttpClient client, int limit, boolean getIcon, int scaledIconSize) {
-        this(context, client, limit, getIcon, scaledIconSize, DEFAULT_BUFFER_SIZE);
-    }
-
-    public BaseGetPodcastTask(Context context, OkHttpClient client, int limit, boolean getIcon) {
-        this(context, client, limit, getIcon, -1);
+    public BaseGetPodcastTask(Context context, OkHttpClient client, int limit) {
+        this(context, client, limit, DEFAULT_BUFFER_SIZE);
     }
 
     /**
@@ -114,7 +102,6 @@ public class BaseGetPodcastTask
                 is = new BOMInputStream(is, false);
                 Log.d(TAG, "inputStream: class "+is.getClass());
 
-                //is = getInputStreamFromURL(url, timeoutSec_, true);
                 XmlPullParser parser = factory.newPullParser();
                 //TODO: use reader or give correct encoding
                 parser.setInput(is, "UTF-8");
@@ -193,7 +180,7 @@ public class BaseGetPodcastTask
                             tagName = TagName.NONE;
                         }
                     }
-                    eventType = parser.next();
+                    parser.next();
                 }
                 publish();
                 response.close();

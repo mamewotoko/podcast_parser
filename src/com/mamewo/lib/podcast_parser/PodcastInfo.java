@@ -84,7 +84,6 @@ public class PodcastInfo
             return url;
         }
         int pos = url.indexOf("://");
-        int len = url.length();
         return url.substring(0, pos) + "://" + username_ +":"+password_+"@"+url.substring(pos+3);
     }
 }

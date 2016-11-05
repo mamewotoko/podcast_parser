@@ -1,13 +1,10 @@
 package com.mamewo.lib.podcast_parser;
 
 import java.io.Serializable;
-import java.net.URL;
-import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Comparator;
 
 import android.util.Log;
 
