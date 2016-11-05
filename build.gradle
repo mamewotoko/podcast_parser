@@ -39,6 +39,11 @@ android {
       }
     }
   }
+
+  //XXX https://github.com/square/okio/issues/58
+  lintOptions {
+    warning 'InvalidPackage'
+  }
 }
 
 dependencies {
