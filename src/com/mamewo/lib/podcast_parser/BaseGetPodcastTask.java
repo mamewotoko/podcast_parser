@@ -32,7 +32,8 @@ public class BaseGetPodcastTask
     final static
     private EpisodeInfo[] DUMMY_ARRAY = new EpisodeInfo[0];
     private int publishBufferSize_;
-
+    private List<PodcastInfo> authRequired_;
+    
     final static
     private String TAG = "podparser";
 
@@ -53,12 +54,17 @@ public class BaseGetPodcastTask
         client_ = client;
         buffer_ = new ArrayList<EpisodeInfo>();
         publishBufferSize_ = publishBufferSize;
+        authRequired_ = new ArrayList<PodcastInfo>();
     }
 
     public BaseGetPodcastTask(Context context, OkHttpClient client, int limit) {
         this(context, client, limit, DEFAULT_BUFFER_SIZE);
     }
 
+    public List<PodcastInfo> getAuthRequiredList(){
+        return authRequired_;
+    }
+    
     /**
      * @param podcastInfo podcast to load. podcastInfo.iconURL_ will be updated in this function
      */
@@ -91,6 +97,7 @@ public class BaseGetPodcastTask
                 if(response.code() == 401){
                     //TODO: queue auth request and retry
                     Log.i(TAG, "auth required: "+url);
+                    authRequired_.add(pinfo);
                     continue;
                 }
                 if(!response.isSuccessful()){

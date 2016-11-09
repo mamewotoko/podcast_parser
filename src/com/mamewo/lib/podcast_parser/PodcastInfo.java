@@ -10,6 +10,13 @@ public class PodcastInfo
     /**
      * 
      */
+    public enum Status {
+        UNKNOWN,
+        PUBLIC,
+        AUTH_REQUIRED,
+        ERROR
+    }
+    
     private static final long serialVersionUID = 7613791894671950703L;
     public String title_;
     public URL url_;
@@ -19,8 +26,9 @@ public class PodcastInfo
     //TODO: hold in secure area?
     public String username_;
     public String password_;
+    public Status lastStatus_;
     
-    public PodcastInfo(String title, URL url, String iconURL, boolean enabled, String username, String password) {
+    public PodcastInfo(String title, URL url, String iconURL, boolean enabled, String username, String password, Status status) {
         title_ = title;
         url_ = url;
         iconURL_ = iconURL;
@@ -28,10 +36,11 @@ public class PodcastInfo
 
         username_ = username;
         password_ = password;
+        lastStatus_ = status;
     }
 
     public PodcastInfo(String title, URL url, String iconURL, boolean enabled) {
-        this(title, url, iconURL, enabled, null, null);
+        this(title, url, iconURL, enabled, null, null, Status.UNKNOWN);
     }
     
     public String getTitle(){
@@ -85,5 +94,13 @@ public class PodcastInfo
         }
         int pos = url.indexOf("://");
         return url.substring(0, pos) + "://" + username_ +":"+password_+"@"+url.substring(pos+3);
+    }
+
+    public Status getStatus(){
+        return lastStatus_;
+    }
+
+    public void setStatus(Status status){
+        lastStatus_ = status;
     }
 }
