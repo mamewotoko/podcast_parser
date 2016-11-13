@@ -97,11 +97,12 @@ public class BaseGetPodcastTask
                 if(response.code() == 401){
                     //TODO: queue auth request and retry
                     Log.i(TAG, "auth required: "+url);
-                    authRequired_.add(pinfo);
+                    pinfo.setStatus(PodcastInfo.Status.AUTH_REQUIRED_LOCKED);
                     continue;
                 }
                 if(!response.isSuccessful()){
                     Log.i(TAG, "http error: "+response.message()+", "+url.toString());
+                    pinfo.setStatus(PodcastInfo.Status.ERROR);
                     continue;
                 }
                 is = response.body().byteStream();
@@ -189,6 +190,12 @@ public class BaseGetPodcastTask
                     parser.next();
                 }
                 publish();
+                if(null != pinfo.getUsername() && null != pinfo.getPassword()){
+                    pinfo.setStatus(PodcastInfo.Status.AUTH_REQUIRED_UNLOCKED);
+                }
+                else {
+                    pinfo.setStatus(PodcastInfo.Status.PUBLIC);
+                }
                 response.close();
             }
             catch (IOException e) {

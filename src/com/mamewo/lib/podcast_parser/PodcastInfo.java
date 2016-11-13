@@ -3,6 +3,7 @@ package com.mamewo.lib.podcast_parser;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.MalformedURLException;
+import android.util.Log;
 
 public class PodcastInfo 
     implements Serializable
@@ -13,9 +14,12 @@ public class PodcastInfo
     public enum Status {
         UNKNOWN,
         PUBLIC,
-        AUTH_REQUIRED,
+        AUTH_REQUIRED_LOCKED,
+        AUTH_REQUIRED_UNLOCKED,
         ERROR
     }
+    final static
+    private String TAG = "podparser";
     
     private static final long serialVersionUID = 7613791894671950703L;
     public String title_;
@@ -48,6 +52,10 @@ public class PodcastInfo
     }
 
     public URL getURL(){
+        return url_;
+    }
+    
+    public URL getURLWithAuthInfo(){
         if(null != username_ && null != password_){
             //url_.setUserInfo(username_+":"+password_);
             try{
@@ -89,7 +97,7 @@ public class PodcastInfo
     }
 
     public String addUserInfo(String url){
-        if(null == username_ || null == password_){
+        if(null == url || null == username_ || null == password_){
             return url;
         }
         int pos = url.indexOf("://");
