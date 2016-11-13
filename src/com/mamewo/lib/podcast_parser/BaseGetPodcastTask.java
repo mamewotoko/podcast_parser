@@ -19,6 +19,7 @@ import okhttp3.OkHttpClient;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.Base64;
 
 public class BaseGetPodcastTask
     extends AsyncTask<PodcastInfo, EpisodeInfo, Void>
@@ -86,13 +87,21 @@ public class BaseGetPodcastTask
             if (!pinfo.enabled_) {
                 continue;
             }
-            URL url = pinfo.url_;
-            Log.d(TAG, "get URL: " + pinfo.url_);
+            URL url = pinfo.getURL();
+            String username = pinfo.getUsername();
+            String password = pinfo.getPassword();
+            Log.d(TAG, "get URL: " + pinfo.getURL());
             InputStream is = null;
             try {
-                Request request = new Request.Builder()
-                    .url(url)
-                    .build();
+                Request.Builder builder = new Request.Builder();
+                builder.url(url);
+                if(null != username && null != password){
+                    String data = username+":"+password;
+                    String encoded = Base64.encodeToString(data.getBytes(), Base64.NO_WRAP);
+                    Log.d(TAG, "AUTH: "+encoded + " : "+ username + " " + password);
+                    builder.addHeader("Authorization", "Basic "+encoded);
+                }
+                Request request = builder.build();
                 Response response = client_.newCall(request).execute();
                 if(response.code() == 401){
                     //TODO: queue auth request and retry

@@ -8,9 +8,6 @@ import android.util.Log;
 public class PodcastInfo 
     implements Serializable
 {
-    /**
-     * 
-     */
     public enum Status {
         UNKNOWN,
         PUBLIC,
@@ -73,6 +70,10 @@ public class PodcastInfo
     }
 
     public String getIconURL(){
+        return iconURL_;
+    }
+
+    public String getIconURLWithAuthInfo(){
         return addUserInfo(iconURL_);
     }
 
@@ -97,6 +98,7 @@ public class PodcastInfo
     }
 
     public String addUserInfo(String url){
+        Log.d(TAG, "addUserInfo: " + url + " " + username_ + " " + password_);
         if(null == url || null == username_ || null == password_){
             return url;
         }

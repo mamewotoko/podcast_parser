@@ -57,12 +57,19 @@ public class EpisodeInfo
     }
 
     public boolean equalEpisode(EpisodeInfo other){
-        //TODO: remove user info from url
-        return url_.equals(other.url_) && pubdate_.equals(other.pubdate_);
+        return getURL().equals(other.getURL()) && getPubdateString().equals(other.getPubdateString());
     }
 
     public String getURL(){
-        return podcast_.addUserInfo(url_);
+        return url_;
+    }
+
+    public String getUsername(){
+        return podcast_.getUsername();
+    }
+
+    public String getPassword(){
+        return podcast_.getPassword();
     }
     
     // static
