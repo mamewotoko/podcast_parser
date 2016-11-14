@@ -31,6 +31,9 @@ public class PodcastInfo
     
     public PodcastInfo(String title, URL url, String iconURL, boolean enabled, String username, String password, Status status) {
         title_ = title;
+        if(null == title_){
+            title_ = "";
+        }
         url_ = url;
         iconURL_ = iconURL;
         enabled_ = enabled;
