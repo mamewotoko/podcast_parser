@@ -19,15 +19,15 @@ public class PodcastInfo
     private String TAG = "podparser";
     
     private static final long serialVersionUID = 7613791894671950703L;
-    public String title_;
-    public URL url_;
-    public boolean enabled_;
-    public String iconURL_;
+    private String title_;
+    private URL url_;
+    private boolean enabled_;
+    private String iconURL_;
 
     //TODO: hold in secure area?
-    public String username_;
-    public String password_;
-    public Status lastStatus_;
+    private String username_;
+    private String password_;
+    private Status lastStatus_;
     
     public PodcastInfo(String title, URL url, String iconURL, boolean enabled, String username, String password, Status status) {
         title_ = title;
@@ -69,6 +69,10 @@ public class PodcastInfo
         return enabled_;
     }
 
+    public void setEnabled(boolean enabled){
+        enabled_ = enabled;
+    }
+    
     public String getIconURL(){
         return iconURL_;
     }

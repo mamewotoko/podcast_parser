@@ -84,7 +84,7 @@ public class BaseGetPodcastTask
             if(isCancelled()){
                 break;
             }
-            if (!pinfo.enabled_) {
+            if (!pinfo.getEnabled()) {
                 continue;
             }
             URL url = pinfo.getURL();
@@ -179,7 +179,7 @@ public class BaseGetPodcastTask
                                 EpisodeInfo info = new EpisodeInfo(pinfo, podcastURL, title, pubdate, link, i);
                                 buffer_.add(info);
                                 if (buffer_.size() >= publishBufferSize_) {
-                                    Log.d(TAG, "publish: "+podcastURL+" "+title);
+                                    //Log.d(TAG, "publish: "+podcastURL+" "+title);
                                     publish();
                                 }
                             }

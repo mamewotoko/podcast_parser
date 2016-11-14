@@ -20,14 +20,14 @@ public class EpisodeInfo
     
     private static final long serialVersionUID = 1L;
     public PodcastInfo podcast_;
-    final public String url_;
-    final public String title_;
-    final public String pubdate_;
-    public Date pubdateobj_;
-    final public String link_;
+    final private String url_;
+    final private String title_;
+    final private String pubdate_;
+    final private String link_;
     final public int index_;
 
-    //url: without auth info
+    private Date pubdateobj_;
+    
     public EpisodeInfo(PodcastInfo podcast, String url, String title, String pubdate, String link, int index) {
         podcast_ = podcast;
         url_ = url;
@@ -60,6 +60,10 @@ public class EpisodeInfo
         return getURL().equals(other.getURL()) && getPubdateString().equals(other.getPubdateString());
     }
 
+    public String getTitle(){
+        return title_;
+    }
+    
     public String getURL(){
         return url_;
     }
@@ -70,6 +74,21 @@ public class EpisodeInfo
 
     public String getPassword(){
         return podcast_.getPassword();
+    }
+
+    public String getURLWithAuthInfo(){
+        if(null == podcast_.getUsername() || null == podcast_.getPassword()){
+            return url_;
+        }
+        return podcast_.addUserInfo(url_);
+    }
+
+    public String getLink(){
+        return link_;
+    }
+
+    public int getIndex(){
+        return index_;
     }
     
     // static
