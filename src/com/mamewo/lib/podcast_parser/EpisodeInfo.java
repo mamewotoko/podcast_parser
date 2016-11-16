@@ -60,6 +60,10 @@ public class EpisodeInfo
         return getURL().equals(other.getURL()) && getPubdateString().equals(other.getPubdateString());
     }
 
+    public PodcastInfo getPodcastInfo(){
+        return podcast_;
+    }
+    
     public String getTitle(){
         return title_;
     }
