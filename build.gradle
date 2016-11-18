@@ -13,8 +13,8 @@ android {
   repositories {
     jcenter()
   }
-  compileSdkVersion 23
-  buildToolsVersion "23.0.1"
+  compileSdkVersion 24
+  buildToolsVersion "24.0.3"
 
   defaultConfig {
     minSdkVersion 10
