@@ -51,6 +51,10 @@ public class PodcastInfo
         return title_;
     }
 
+    public void setTitle(String title){
+        title_ = title;
+    }
+    
     public URL getURL(){
         return url_;
     }
