@@ -214,7 +214,7 @@ public class BaseGetPodcastTask
                 Log.i(TAG, "XmlPullParserException", e);
             }
             finally {
-                Log.i(TAG, "finished loading podcast");
+                //Log.i(TAG, "finished loading podcast");
                 if(null != is) {
                     try {
                         is.close();
