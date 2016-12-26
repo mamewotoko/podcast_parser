@@ -9,7 +9,6 @@ import android.util.Log;
 
 /**
  * @author Takashi Masuyama <mamewotoko@gmail.com>
- * http://www002.upp.so-net.ne.jp/mamewo/
  */
 
 public class EpisodeInfo
