@@ -1,7 +1,8 @@
-podcast_parser: Android AsyncTask class to parse podcast file
+podcast_parser: Android AsyncTask class to parse podcast file [![Build Status](https://travis-ci.org/mamewotoko/podcast_parser.svg)](https://travis-ci.org/mamewotoko/podcast_parser)
 =============================================================
 
-To share code between podplayer and malarm....
+AsyncTask to fetch and parse podcast xml
+
 
 Related repositories
 --------------------
@@ -11,5 +12,5 @@ Related repositories
 
 ----
 Takashi Masuyama < mamewotoko@gmail.com >  
-http://www002.upp.so-net.ne.jp/mamewo/  
+http://mamewo.ddo.jp
 
