@@ -5,18 +5,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.text.DateFormat;
 import android.util.Log;
 
 public class EpisodeInfo
     implements Serializable
 {
-    //read
+    //parse pattern
     static final String DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss Z";
     static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN, Locale.US);
 
     static final
     String TAG = "podparser";
-    
+    static final
+    private DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm Z");
+        
     private static final long serialVersionUID = 1L;
     public PodcastInfo podcast_;
     final private String url_;
@@ -46,17 +49,20 @@ public class EpisodeInfo
     }
 
     public String getPubdateString(){
-        if(null != pubdateobj_) {
-            //return pubdateobj_.toLocaleString();
-            synchronized(DATE_FORMAT){
-                return DATE_FORMAT.format(pubdateobj_);
-            }
+        return getPubdateString(DEFAULT_DATE_FORMAT);
+    }
+
+    public String getPubdateString(DateFormat format){
+        if(null == pubdateobj_){
+            return pubdate_;
         }
-        return pubdate_;
+        synchronized(format){
+            return format.format(pubdateobj_);
+        }
     }
 
     public boolean equalEpisode(EpisodeInfo other){
-        return getURL().equals(other.getURL()) && getPubdateString().equals(other.getPubdateString());
+        return getURL().equals(other.getURL());
     }
 
     public PodcastInfo getPodcastInfo(){
